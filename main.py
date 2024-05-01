@@ -26,11 +26,13 @@ main_html = """
 
 
       numero = getRndInteger(0, 10);
+      symbols_name = ["heart","diamond","club","spade"]
       symbols = ["♥", "♦", "♣", "♠"];
       random = Math.floor(Math.random() * symbols.length);
-      aleatorio = symbols[random];
+      aleatorio_graf = symbols[random];
+      aleatorio = symbols_name[random];
 
-      document.getElementById('mensaje').innerHTML  = 'Dibujando un ' + aleatorio;
+      document.getElementById('mensaje').innerHTML  = 'Dibujando un ' + aleatorio_graf;
       document.getElementById('numero').value = aleatorio;
 
       $('#myCanvas').mousedown(function (e) {
@@ -102,7 +104,8 @@ main_html = """
       </form>
     </div>
 </body>
-</html>"""
+</html>
+"""
 
 
 @app.route("/")
@@ -116,9 +119,11 @@ def upload():
         # check if the post request has the file part
         img_data = request.form.get("myImage").replace("data:image/png;base64,", "")
         aleatorio = request.form.get("numero")
-        print(aleatorio)
+        print("Simbolo: ", aleatorio)
+        if not os.path.exists(aleatorio):
+            os.makedirs(aleatorio)
         with tempfile.NamedTemporaryFile(
-            delete=False, mode="w+b", suffix=".png", dir=str(aleatorio)
+            delete=False, mode="w+b", suffix=".png", dir=aleatorio
         ) as fh:
             fh.write(base64.b64decode(img_data))
         # file = request.files['myImage']
@@ -169,4 +174,8 @@ def download_y():
 
 
 if __name__ == "__main__":
+    symbols = ["heart", "diamond", "club", "spade"]
+    for s in symbols:
+        if not os.path.exists(s):
+            os.mkdir(s)
     app.run()
