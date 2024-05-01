@@ -10,9 +10,8 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire app directory into the container
+# Copy the Flask app code into the container
 COPY . .
 
-# Set the command to run the Flask app
-CMD ["gunicorn","--bind","0.0.0.0:$PORT","main:app"]
-
+# Set the command to run the Flask app with Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "main:app"]
