@@ -102,9 +102,7 @@ main_html = """
       </form>
     </div>
 </body>
-</html>
-
-"""
+</html>"""
 
 
 @app.route("/")
@@ -134,22 +132,30 @@ def upload():
 
 @app.route("/prepare", methods=["GET"])
 def prepare_dataset():
-    images = []
-    d = ["♥", "♦", "♣", "♠"]
-    simbols_name = ["heart", "diamond", "club", "spade"]
-    digits = []
-    for i, digit in enumerate(d):
-        filelist = glob.glob("{}/*.png".format(simbols_name[i]))
-        images_read = io.concatenate_images(io.imread_collection(filelist))
-        images_read = images_read[:, :, :, 3]
-        digits_read = np.array([digit] * images_read.shape[0])
-        images.append(images_read)
-        digits.append(digits_read)
-    images = np.vstack(images)
-    digits = np.concatenate(digits)
-    np.save("X.npy", images)
-    np.save("y.npy", digits)
-    return "OK!"
+    try:
+        images = []
+        d = ["♥", "♦", "♣", "♠"]
+        simbols_name = ["heart", "diamond", "club", "spade"]
+        digits = []
+        for i, digit in enumerate(d):
+            if not os.path.exists(simbols_name[i]):
+                os.makedirs(simbols_name[i])
+            filelist = glob.glob(f"{simbols_name[i]}/*.png")
+            if filelist:
+                images_read = io.concatenate_images(io.imread_collection(filelist))
+                images_read = images_read[:, :, :, 3]
+                digits_read = np.array([digit] * images_read.shape[0])
+                images.append(images_read)
+                digits.append(digits_read)
+        if images and digits:
+            images = np.vstack(images)
+            digits = np.concatenate(digits)
+            np.save("X.npy", images)
+            np.save("y.npy", digits)
+        return "OK!"
+    except Exception as e:
+        print(f"Error in prepare_dataset: {e}")
+        return "Error occurred", 500
 
 
 @app.route("/X.npy", methods=["GET"])
@@ -163,8 +169,4 @@ def download_y():
 
 
 if __name__ == "__main__":
-    digits = ["♥", "♦", "♣", "♠"]
-    for d in digits:
-        if not os.path.exists(str(d)):
-            os.mkdir(str(d))
     app.run()
