@@ -136,9 +136,10 @@ def upload():
 def prepare_dataset():
     images = []
     d = ["♥", "♦", "♣", "♠"]
+    simbols_name = ["heart", "diamond", "club", "spade"]
     digits = []
-    for digit in d:
-        filelist = glob.glob("{}/*.png".format(digit))
+    for i, digit in enumerate(d):
+        filelist = glob.glob("{}/*.png".format(simbols_name[i]))
         images_read = io.concatenate_images(io.imread_collection(filelist))
         images_read = images_read[:, :, :, 3]
         digits_read = np.array([digit] * images_read.shape[0])
